@@ -1,0 +1,18 @@
+---
+logParams:
+  logFile: '/opt/snmpmon/logfile.log'
+  logLevel: 'DEBUG'
+  rotateTime: 'midnight'
+  backupCount: 5
+
+httpParams:
+  listen: 8080
+
+tmpdir: '/opt/snmpmon/output/'
+
+snmpMon:
+  dellos9_s0:
+    snmpParams:
+        community: mgmt_hep
+        hostname: 172.16.1.1
+        version: 2
