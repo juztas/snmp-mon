@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""
+"""
+from SNMPMon.webserver import HTTPExpose
+from SNMPMon.utilities import getConfig
+
+if __name__ == "__main__":
+    config = getConfig('/etc/snmp-mon.yaml')
+    webUI = HTTPExpose(config)
+    webUI.startwork()

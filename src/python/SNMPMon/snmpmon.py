@@ -26,7 +26,15 @@ class SNMPMonitoring():
         self.logger = getTimeRotLogger(**config['logParams'])
 
     def _cleanOldCopies(self):
-        print(os.listdir(self.config['tmpdir']))
+        self.logger.info('Start check of old files')
+        allfiles = os.listdir(self.config['tmpdir'])
+        if len(allfiles) <= self.config.get('outcopies', 10):
+            return
+        while len(allfiles) >= self.config.get('outcopies', 10):
+            fName = allfiles.pop(0)
+            fileRemove = os.path.join(self.config['tmpdir'], fName)
+            os.remove(fileRemove)
+            self.logger.info(f'File {fileRemove} removed. Old.')
 
     def _writeOutFile(self, out):
         dumpFileContentAsJson(self.config, out)
@@ -63,6 +71,7 @@ class SNMPMonitoring():
                     out[indx][key] = item.value.replace('\x00', '')
             jsonOut[host] = out
         self._writeOutFile(jsonOut)
+        self._cleanOldCopies()
         if err:
             raise Exception(f'SNMP Monitoring Errors: {err}')
 

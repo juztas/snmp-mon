@@ -1,4 +1,5 @@
 import os
+import ast
 import time
 import datetime
 import logging
@@ -14,9 +15,44 @@ LEVELS = {'FATAL': logging.FATAL,
           'INFO': logging.INFO,
           'DEBUG': logging.DEBUG}
 
+def isValFloat(inVal):
+    """Check if inVal is float"""
+    try:
+        float(inVal)
+    except ValueError:
+        return False
+    return True
+
+def evaldict(inputDict):
+    """Output from the server needs to be evaluated."""
+    if not inputDict:
+        return {}
+    if isinstance(inputDict, (list, dict)):
+        return inputDict
+    out = {}
+    try:
+        out = ast.literal_eval(inputDict)
+    except ValueError:
+        out = json.loads(inputDict)
+    except SyntaxError as ex:
+        raise Exception(f'Got Syntax Error: {ex}')
+    return out
+
+def getFileContentAsJson(inputFile):
+    """Get file content as json."""
+    out = {}
+    if os.path.isfile(inputFile):
+        with open(inputFile, 'r', encoding='utf-8') as fd:
+            try:
+                out = json.load(fd)
+            except ValueError:
+                print(fd.seek(0))
+                out = evaldict(fd.read())
+    return out
+
 def dumpFileContentAsJson(config, content):
     """Dump File content with locks."""
-    filename = os.path.join(config['tmpdir'], 'snmp-out.json')
+    filename = os.path.join(config['tmpdir'], 'snmp-out-%s.json' % getUTCnow())
     tmpoutFile = filename + '.tmp'
     with open(tmpoutFile, 'w+', encoding='utf-8') as fd:
         json.dump(content, fd)
