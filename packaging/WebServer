@@ -14,8 +14,8 @@ from SNMPMon.utilities import getConfig
 from SNMPMon.webserver import HTTPExpose
 
 
-COMPONENT = 'SNMPMonitoring'
-DESCRIPTION = "SNMPMonitoring responsible for getting SNMP data from switches"
+COMPONENT = 'WebServer'
+DESCRIPTION = "WebServer exposes metrics in prometheus format"
 DAEMON = None
 
 class MyDaemon(Daemon):
