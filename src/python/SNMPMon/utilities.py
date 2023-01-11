@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+"""
+    SNMP Monitoring utilities
+Authors:
+  Justas Balcas jbalcas (at) caltech.edu
+
+Date: 2023/01/10
+"""
 import os
 import ast
 import time

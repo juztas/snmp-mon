@@ -17,6 +17,7 @@ from easysnmp.exceptions import EasySNMPTimeoutError
 from SNMPMon.utilities import getConfig
 from SNMPMon.utilities import getTimeRotLogger
 from SNMPMon.utilities import dumpFileContentAsJson
+from SNMPMon.utilities import getUTCnow
 
 class SNMPMonitoring():
     """SNMP Monitoring Class"""
@@ -25,7 +26,7 @@ class SNMPMonitoring():
         self.config = config
         self.logger = getTimeRotLogger(**config['logParams'])
 
-    def _cleanOldCopies(self):
+    def _cleanOldCopies(self, ignoreList=[]):
         self.logger.info('Start check of old files')
         allfiles = os.listdir(self.config['tmpdir'])
         if len(allfiles) <= self.config.get('outcopies', 10):
@@ -33,12 +34,19 @@ class SNMPMonitoring():
         while len(allfiles) >= self.config.get('outcopies', 10):
             fName = allfiles.pop(0)
             fileRemove = os.path.join(self.config['tmpdir'], fName)
+            if fileRemove in ignoreList:
+                continue
             os.remove(fileRemove)
             self.logger.info(f'File {fileRemove} removed. Old.')
 
     def _writeOutFile(self, out):
-        dumpFileContentAsJson(self.config, out)
-        return out
+        return dumpFileContentAsJson(self.config, out)
+
+    def _linkNewFile(self, dstFile, srcFile):
+        if os.path.isfile(dstFile):
+            os.unlink(dstFile)
+        os.symlink(srcFile, dstFile)
+
 
     def startwork(self):
         """Scan all switches and get snmp data"""
@@ -70,8 +78,12 @@ class SNMPMonitoring():
                     out.setdefault(indx, {})
                     out[indx][key] = item.value.replace('\x00', '')
             jsonOut[host] = out
-        self._writeOutFile(jsonOut)
-        self._cleanOldCopies()
+        jsonOut['snmp_scan_runtime'] = getUTCnow()
+        newFName = self._writeOutFile(jsonOut)
+        latestFName = os.path.join(self.config['tmpdir'], 'snmp-out-latest.json')
+        ignoreList = [newFName, latestFName]
+        self._linkNewFile(latestFName, newFName)
+        self._cleanOldCopies(ignoreList=ignoreList)
         if err:
             raise Exception(f'SNMP Monitoring Errors: {err}')
 

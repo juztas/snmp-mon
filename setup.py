@@ -16,7 +16,7 @@ SCRIPTS = ["packaging/SNMPMonitoring", "packaging/WebServer"]
 
 setup(
     name='SNMPMon',
-    version="%s" % VERSION,
+    version=f"{VERSION}",
     long_description="SNMPMon installation",
     author="Justas Balcas",
     author_email="juztas@gmail.com",
