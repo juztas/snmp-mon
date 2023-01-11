@@ -2,6 +2,9 @@ import os
 import time
 import datetime
 import logging
+import logging.handlers
+import shutil
+import simplejson as json
 from yaml import safe_load as yload
 
 # Logging levels.
@@ -10,6 +13,15 @@ LEVELS = {'FATAL': logging.FATAL,
           'WARNING': logging.WARNING,
           'INFO': logging.INFO,
           'DEBUG': logging.DEBUG}
+
+def dumpFileContentAsJson(config, content):
+    """Dump File content with locks."""
+    filename = os.path.join(config['tmpdir'], 'snmp-out.json')
+    tmpoutFile = filename + '.tmp'
+    with open(tmpoutFile, 'w+', encoding='utf-8') as fd:
+        json.dump(content, fd)
+    shutil.move(tmpoutFile, filename)
+    return filename
 
 def getConfig(filename):
     """Get Config file"""

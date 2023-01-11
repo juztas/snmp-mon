@@ -9,13 +9,14 @@ Authors:
 
 Date: 2022/11/21
 """
+import os
 import sys
-import simplejson as json
 from easysnmp import Session
 from easysnmp.exceptions import EasySNMPUnknownObjectIDError
 from easysnmp.exceptions import EasySNMPTimeoutError
 from SNMPMon.utilities import getConfig
 from SNMPMon.utilities import getTimeRotLogger
+from SNMPMon.utilities import dumpFileContentAsJson
 
 class SNMPMonitoring():
     """SNMP Monitoring Class"""
@@ -24,7 +25,11 @@ class SNMPMonitoring():
         self.config = config
         self.logger = getTimeRotLogger(**config['logParams'])
 
+    def _cleanOldCopies(self):
+        print(os.listdir(self.config['tmpdir']))
+
     def _writeOutFile(self, out):
+        dumpFileContentAsJson(self.config, out)
         return out
 
     def startwork(self):
@@ -57,7 +62,7 @@ class SNMPMonitoring():
                     out.setdefault(indx, {})
                     out[indx][key] = item.value.replace('\x00', '')
             jsonOut[host] = out
-        self._writeOutFile(out)
+        self._writeOutFile(jsonOut)
         if err:
             raise Exception(f'SNMP Monitoring Errors: {err}')
 

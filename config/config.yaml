@@ -9,6 +9,7 @@ httpParams:
   listen: 8080
 
 tmpdir: '/opt/snmpmon/output/'
+outcopies: 10
 
 snmpMon:
   dellos9_s0:

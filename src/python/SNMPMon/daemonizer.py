@@ -208,7 +208,7 @@ class Daemon():
             except:
                 exc = traceback.format_exc()
                 self.logger.critical("Exception!!! Error details:  %s", exc)
-                time.sleep(10)
+                time.sleep(30)
 
     def run(self):
         """Run main execution"""
@@ -226,7 +226,7 @@ class Daemon():
                         exc = traceback.format_exc()
                         self.logger.critical("Exception!!! Error details:  %s", exc)
                 if self.runLoop():
-                    time.sleep(10)
+                    time.sleep(30)
             except KeyboardInterrupt as ex:
                 self.logger.critical("Received KeyboardInterrupt: %s ", ex)
                 sys.exit(3)
