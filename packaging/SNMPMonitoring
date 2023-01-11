@@ -34,5 +34,5 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         parser.print_help()
     inargs = parser.parse_args(sys.argv[1:])
-    DAEMON = Daemon(COMPONENT, inargs)
+    DAEMON = MyDaemon(COMPONENT, inargs)
     DAEMON.command()
